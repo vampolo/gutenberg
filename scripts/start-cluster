@@ -1,0 +1,3 @@
+#!/bin/sh
+
+gcloud container clusters create gutenberg-cluster --num-nodes=1 --scopes bigquery --enable-kubernetes-alpha

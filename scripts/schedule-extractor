@@ -1,0 +1,3 @@
+#!/bin/sh
+
+kubectl run extractor --schedule="7 */2 * * *" --restart="Never" --image=gcr.io/gutenberg-161202/extractor:0.2
