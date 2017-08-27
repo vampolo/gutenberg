@@ -101,7 +101,8 @@ class Paper:
                 if article.is_downloaded:
                     article.parse()
                     article.nlp()
-                    yield Article.from_newspaper_article(article)
+                    if article.text != "":
+                        yield Article.from_newspaper_article(article)
 
     def is_article_of_paper(self, url):
         logging.debug('checking if article of paper {} - {}'.format(self._parsed_paper_url.netloc, url))
