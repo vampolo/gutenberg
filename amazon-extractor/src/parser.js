@@ -21,39 +21,29 @@ const TITLE_SELECTOR = '[data-hook="review-title"]';
 const STAR_SELECTOR = '[data-hook="review-star-rating"]';
 const BODY_SELECTOR = '[data-hook="review-body"]';
 const DATE_SELECTOR = '[data-hook="review-date"]';
-const AUTHOR_SELECTOR = '[data-hook="review-author"]';
+const AUTHOR_SELECTOR = 'a[data-hook="review-author"]';
 
 const CURRENT_PAGE_SELECTOR = '[data-hook="pagination-bar"] .a-selected > a';
 const NEXT_PAGE_SELECTOR = '[data-hook="pagination-bar"] .a-last:not(.a-disabled) > a';
 
-const show = async page => { await page.screenshot({ path: 'show.png' }); logger.info("Took screenshot")};
+const show = async page => {
+  const name = Date.now()+'';
+  await page.screenshot({ path: `${name}.png` });
+  logger.info(`Took screenshot ${name}`);
+};
 
 const random = (min=0, max=1) => Math.floor(Math.random()*(max-min+1)+min);
 
 const parseReviewInPage = async (page, i) => {
-  const title = await page.evaluate(({sel, i}) => {
-    return document.querySelectorAll(sel)[i].innerHTML;
-  }, {sel: TITLE_SELECTOR, i});
+  const reviewsContainer = await page.$(REVIEW_SECTION_SELECTOR);
+  const reviews = await reviewsContainer.$$(REVIEW_SELECTOR);
+  const review = reviews[i];
 
-  const stars = await page.evaluate(({sel, i}) => {
-    return document.querySelectorAll(sel)[i].getAttribute('class');
-  }, {sel: STAR_SELECTOR, i});
-
-  const body = await page.evaluate(({sel, i}) => {
-    return document.querySelectorAll(sel)[i].innerHTML;
-  }, {sel: BODY_SELECTOR, i});
-
-  const date = await page.evaluate(({sel, i}) => {
-    return document.querySelectorAll(sel)[i].innerHTML.slice(3);
-  }, {sel: DATE_SELECTOR, i});
-
-  const author =  await page.evaluate(({sel, i}) => {
-    const el = document.querySelectorAll(sel)[i];
-    return {
-      name: el.innerHTML,
-      link: el.getAttribute('href'),
-    };
-  }, {sel: AUTHOR_SELECTOR, i});
+  const title = await page.evaluate(el => el.innerHTML, await review.$(TITLE_SELECTOR));
+  const stars = await page.evaluate(el => el.getAttribute('class'), await review.$(STAR_SELECTOR));
+  const body = await page.evaluate(el => el.innerHTML, await review.$(BODY_SELECTOR));
+  const date = await page.evaluate(el => el.innerHTML.slice(3), await review.$(DATE_SELECTOR));
+  const author = await page.evaluate(el => ({name: el.innerHTML, link: el.getAttribute('href')}), await review.$(AUTHOR_SELECTOR));
 
   return {
     title,
@@ -62,7 +52,7 @@ const parseReviewInPage = async (page, i) => {
     date,
     author,
   };
-};
+}
 
 const getReviewsInPage = async page => {
   const listLength = await page.evaluate((sel) => {
