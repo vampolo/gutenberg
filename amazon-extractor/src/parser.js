@@ -41,9 +41,9 @@ const parseReviewInPage = async (page, i) => {
 
   const title = await page.evaluate(el => el.innerHTML, await review.$(TITLE_SELECTOR));
   const stars = await page.evaluate(el => el.getAttribute('class'), await review.$(STAR_SELECTOR));
-  const body = await page.evaluate(el => el.innerHTML, await review.$(BODY_SELECTOR));
+  const body = await page.evaluate(el => el.textContent, await review.$(BODY_SELECTOR));
   const date = await page.evaluate(el => el.innerHTML.slice(3), await review.$(DATE_SELECTOR));
-  const author = await page.evaluate(el => ({name: el.innerHTML, link: el.getAttribute('href')}), await review.$(AUTHOR_SELECTOR));
+  const author = await page.evaluate(el => ({name: el.textContent, link: el.getAttribute('href')}), await review.$(AUTHOR_SELECTOR));
 
   return {
     title,
